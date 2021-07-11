@@ -7,10 +7,10 @@ It is also an experiment in functional programming.
 
 from __future__ import division, print_function
 
+from collections import namedtuple
+from functools import partial
 # std imports
 from random import randrange
-from functools import partial
-from collections import namedtuple
 
 # local
 from blessed import Terminal
@@ -44,10 +44,12 @@ Direction = namedtuple('Direction', ('y', 'x',))
 
 # these functions return a new Location instance, given
 # the direction indicated by their name.
-LEFT =(0, -1)
-RIGHT =(0, 1)
-UP =(-1, 0)
-DOWN =(1, 0)
+LEFT = (0, -1)
+RIGHT = (0, 1)
+UP = (-1, 0)
+DOWN = (1, 0)
+
+
 def left_of(segment, term):
     """Return Location left-of given segment."""
     # pylint: disable=unused-argument
@@ -271,6 +273,7 @@ def main():
     score = (worm_length - 1) * 100
     echo(u''.join((term.move_yx(term.height - 1, 1), term.normal)))
     echo(u''.join((u'\r\n', u'score: {}'.format(score), u'\r\n')))
+
 
 if __name__ == '__main__':
     main()
