@@ -13,6 +13,7 @@ phrase=f'{term.on_blue}X{term.normal} Y Z'
 options=['<<','play','pause','>>']
 choice=0
 
+
 def output(options,choice):
     phrase=''
     for i in range(len(options)):
@@ -23,6 +24,7 @@ def output(options,choice):
         #phrase=phrase[0:-2]
     return term.clear() + phrase
 
+print(output(options,choice))
 with term.cbreak():
     #print(term.clear())
     val=''
