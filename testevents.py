@@ -6,7 +6,7 @@ Example event model for a selection of strings
 # local
 from blessed import Terminal
 
-
+#ToDo: implement pub/sub for keystrokes that modify choice. Bring output methods into this.
 class option:
     def __init__(self, graphic, choice):
         self.graphic = graphic
@@ -56,7 +56,7 @@ def multilineoutputverticle(options, choice):
         # phrase=phrase[0:-2]
     return term.clear() + phrase
 
-
+#ToDo: While loop to publish keystrokes among all rendering objects and placing rendered objects on the screen
 def renderverticleoptions(term, options, initialchoice):
     choice = initialchoice
     print(multilineoutputverticle(options, choice))
