@@ -50,6 +50,7 @@ def multilineoutputverticle(options, choice):
     for i in range(len(options)):
         for l in range(maxlines):
             if i == choice:
+                #ToDo: Styles for representing highlights using FormattingString class
                 phrase += f"{term.on_green}{options[i].line(l)}{term.normal}\n"
             else:
                 phrase += f"{options[i].line(l)}\n"
@@ -67,6 +68,7 @@ def renderverticleoptions(term, options, initialchoice):
         while val.lower() != "q":
             val = term.inkey(timeout=3)
             if val:
+                #ToDo: use get_keyboard_codes() to translate for readability
                 if val.code == 258:
                     # left
                     choice = (choice + 1) % len(options)
@@ -89,6 +91,7 @@ def renderhorizontaloptions(term, options, initialchoice):
         while val.lower() != "q":
             val = term.inkey(timeout=3)
             if val:
+                #ToDo: use get_keyboard_codes() to translate for readability
                 if val.code == 261:
                     # left
                     choice = (choice + 1) % len(options)
