@@ -10,9 +10,12 @@ import blessed.keyboard
 from blessed import Terminal
 from FileHandling import FileHandler
 from music import MusicPlayer
+from defaults import JsonConfigHandler
 from os import getcwd
 
 CODES=blessed.keyboard.get_keyboard_codes()
+
+MUSIC_DIR = JsonConfigHandler('config.json').default_dir
 
 class Option:
     def __init__(self, graphic, choice):
@@ -176,7 +179,7 @@ class EventSubscriber:
         songfile=event[0]
         if not songfile == self.currentsong:
             self.currentsong = songfile
-            self.musicplayer.load_file(getcwd() + "/MusicSamples/" + songfile)
+            self.musicplayer.load_file(MUSIC_DIR + songfile)
 
 
 if __name__ == "__main__":
@@ -188,7 +191,7 @@ if __name__ == "__main__":
     o4 = Option(["   ", ">>>", "   "], "next")
     options = [o1, o2, o3, o4]
 
-    fh=FileHandler('./MusicSamples')
+    fh=FileHandler(MUSIC_DIR)
     files=fh.files
     options2=[]
     for file in files:
