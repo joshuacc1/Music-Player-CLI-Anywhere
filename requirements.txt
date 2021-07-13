@@ -1,0 +1,3 @@
+# Requirements to base run the project
+blessed~=1.18.1
+pygame~=2.0.1
