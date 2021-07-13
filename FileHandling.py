@@ -1,7 +1,7 @@
 from os import getcwd, listdir
 from os.path import isdir, isfile, join, splitext
 
-valid_file_extensions = [".mp3", ".wav", ".ogg"]
+valid_file_extensions = [".mp3", ".wav", ".ogg", ".flac"]
 
 
 class FileHandler:
