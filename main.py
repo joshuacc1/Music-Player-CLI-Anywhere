@@ -5,7 +5,7 @@ from music import MusicPlayer
 def main() -> None:
     """Main function"""
     music_player = MusicPlayer()
-    file_handler = FileHandler()
+    file_handler = FileHandler("./samples")
 
     file_handler.get_files()
     print(file_handler.files, file_handler.amt_of_files)
