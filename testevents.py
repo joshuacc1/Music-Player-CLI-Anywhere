@@ -3,10 +3,12 @@
 Example event model for a selection of strings
 """
 
+import types
+
 # local
 import blessed.keyboard
 from blessed import Terminal
-import types
+
 CODES=blessed.keyboard.get_keyboard_codes()
 
 class Option:
@@ -52,7 +54,6 @@ class SelectWidget:
         for i in range(len(self.options)):
             for l in range(maxlines):
                 if i == self.choiceindex:
-                    # ToDo: Styles for representing highlights using FormattingString class
                     phrase += f"{term.on_green}{self.options[i].line(l)}{term.normal}\n"
                 else:
                     phrase += f"{self.options[i].line(l)}\n"
@@ -84,10 +85,9 @@ class SelectWidget:
         for i in range(len(self.options)):
             for l in range(maxlines):
                 if i == self.choiceindex:
-                    # ToDo: Styles for representing highlights using FormattingString class
-                    phrase.append(f"{term.on_green}{self.options[i].line(l)}{term.normal}\n")
+                    phrase.append(f"{term.on_green}{self.options[i].line(l)}{term.normal}")
                 else:
-                    phrase.append(f"{self.options[i].line(l)}\n")
+                    phrase.append(f"{self.options[i].line(l)}")
         return phrase
 
     def choice(self):
@@ -101,9 +101,9 @@ class SelectWidget:
                 self.choiceindex = (self.choiceindex - 1) % len(options)
         else:
             if CODES[keystroke.code] == 'KEY_DOWN':
-                self.choiceindex = (self.choiceindex + 1) % len(options)
+                self.choiceindex = (self.choiceindex + 1) % (len(options)+1)
             elif CODES[keystroke.code] == 'KEY_UP':
-                self.choiceindex = (self.choiceindex - 1) % len(options)
+                self.choiceindex = (self.choiceindex - 1) % (len(options)+1)
 
 
 class MusicTerminal:
@@ -111,6 +111,7 @@ class MusicTerminal:
         self.widgets=[]
         self.term=terminal
         self.event_subscribers=[]
+        self.widgetfocus=0
 
     def run(self):
         self.render()
@@ -121,10 +122,12 @@ class MusicTerminal:
             while val.lower() != "q":
                 val = term.inkey(timeout=3)
                 if val:
-                    self.notify(val)
+                    self.notifywidget(val)
                     self.render()
                     if CODES[val.code]=='KEY_ENTER':
                         self.push_events([w['widget'].choice() for w in self.widgets])
+                    if CODES[val.code]=='KEY_TAB':
+                        self.widgetfocus=(self.widgetfocus + 1) % len(self.widgets)
 
 
     def render(self):
@@ -139,7 +142,7 @@ class MusicTerminal:
             widgetlines=w['widget'].render_lines()
             for l in range(len(widgetlines)):
                 start=screen[x+l][0:y] if screen[x+l][0:y] else ''
-                end=screen[x+l][len(widgetlines[l]):] if screen[x+l][len(widgetlines[l]):] else ''
+                end=screen[x+l][y+len(widgetlines[l]):] if screen[x+l][y+len(widgetlines[l]):] else ''
                 screen[x+l]=start+widgetlines[l]+end
         print(self.term.clear+'\n'.join(screen))
 
@@ -153,6 +156,9 @@ class MusicTerminal:
         for wp in self.widgets:
             w=wp['widget']
             w.update(keystroke)
+
+    def notifywidget(self,keystroke):
+        self.widgets[self.widgetfocus]['widget'].update(keystroke)
 
     def push_events(self,events):
         for es in self.event_subscribers:
@@ -172,23 +178,27 @@ if __name__ == "__main__":
     o2 = Option(["    ", "play", "    "], "play")
     o3 = Option(["     ", "Pause", "     "], "pause")
     o4 = Option(["   ", ">>>", "   "], "next")
-
-    # options=['<<','play','pause','>>']
     options = [o1, o2, o3, o4]
-    choice = 0
 
     o1 = Option(["abbas band"], "abbas band.mp3")
     o2 = Option(["the king"], "the king.mp3")
     o3 = Option(["flinstones"], "flinstones.mp3")
     o4 = Option(["superman"], "superman.mp3")
+    o5 = Option(["Breath"], "Breath.mp3")
+    options2 = [o1, o2, o3, o4, o5]
 
-    options2 = [o1, o2, o3, o4]
-    choice = 0
+    volct=SelectWidget([Option(['='], "v5"),
+                       Option(['='], "v4"),
+                       Option(['='], "v3"),
+                       Option(['='], "v2"),
+                       Option(['='], "v1")])
+
     sw=SelectWidget(options2)
     sw2=SelectWidget(options,layout="Horizontal")
     printevent=EventSubscriber()
     m=MusicTerminal(term)
-    m.add_widget(sw,  (1,6))
-    m.add_widget(sw2, (5,0))
-    m.add_event_subscriber(printevent)
+    m.add_widget(sw,  (1,0))
+    m.add_widget(sw2, (7,0))
+    #m.add_widget(volct, (1,30))
+    #m.add_event_subscriber(printevent)
     m.run()
