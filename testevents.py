@@ -8,6 +8,9 @@ import types
 # local
 import blessed.keyboard
 from blessed import Terminal
+from FileHandling import FileHandler
+from music import MusicPlayer
+from os import getcwd
 
 CODES=blessed.keyboard.get_keyboard_codes()
 
@@ -166,10 +169,15 @@ class MusicTerminal:
 
 class EventSubscriber:
     def __init__(self):
-        pass
+        self.currentsong=''
+        self.musicplayer=MusicPlayer()
 
     def update(self,event):
-        print(event)
+        songfile=event[0]
+        if not songfile == self.currentsong:
+            self.currentsong = songfile
+            self.musicplayer.load_file(getcwd() + "/MusicSamples/" + songfile)
+
 
 if __name__ == "__main__":
     term = Terminal()
@@ -180,12 +188,18 @@ if __name__ == "__main__":
     o4 = Option(["   ", ">>>", "   "], "next")
     options = [o1, o2, o3, o4]
 
-    o1 = Option(["abbas band"], "abbas band.mp3")
-    o2 = Option(["the king"], "the king.mp3")
-    o3 = Option(["flinstones"], "flinstones.mp3")
-    o4 = Option(["superman"], "superman.mp3")
-    o5 = Option(["Breath"], "Breath.mp3")
-    options2 = [o1, o2, o3, o4, o5]
+    fh=FileHandler('./MusicSamples')
+    files=fh.files
+    options2=[]
+    for file in files:
+        options2.append(Option([file],file))
+
+    # o1 = Option(["abbas band"], "abbas band.mp3")
+    # o2 = Option(["the king"], "the king.mp3")
+    # o3 = Option(["flinstones"], "flinstones.mp3")
+    # o4 = Option(["superman"], "superman.mp3")
+    # o5 = Option(["Breath"], "Breath.mp3")
+    # options2 = [o1, o2, o3, o4, o5]
 
     volct=SelectWidget([Option(['='], "v5"),
                        Option(['='], "v4"),
@@ -199,6 +213,7 @@ if __name__ == "__main__":
     m=MusicTerminal(term)
     m.add_widget(sw,  (1,0))
     m.add_widget(sw2, (7,0))
+    #m.add_event_subscriber(fh)
     #m.add_widget(volct, (1,30))
-    #m.add_event_subscriber(printevent)
+    m.add_event_subscriber(printevent)
     m.run()

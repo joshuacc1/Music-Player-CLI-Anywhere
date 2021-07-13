@@ -17,14 +17,14 @@ class MusicPlayer:
 
     def load_file(self, filename: str) -> bool:
         """Function to load file"""
-        try:
-            current_song_obj = pygame.mixer.Sound(filename)
-            self.current_song_file = filename
-            pygame.mixer.music.load(filename)
-            self.total_length = current_song_obj.get_length() * 1000
-        except RuntimeError:
-            print("Error loading file")
-            return False
+        #try:
+        current_song_obj = pygame.mixer.Sound(filename)
+        self.current_song_file = filename
+        pygame.mixer.music.load(filename)
+        self.total_length = current_song_obj.get_length() * 1000
+        #except RuntimeError:
+            # print("Error loading file")
+            # return False
         return True
 
     def play(self) -> None:
