@@ -4,32 +4,44 @@ pygame.init()
 pygame.mixer.init()
 
 
-def play(filename: str) -> bool:
-    """Function to play music"""
-    try:
-        pygame.mixer.music.play(filename)
+class MusicPlayer:
+    """Music player class for handling music"""
+
+    def __init__(self):
+        self.current_song_file = ""
+        self.current_length = 0
+        self.playing = False
+        self.total_length = 1
+        self.volume = 1
+
+    def load_file(self, filename: str) -> bool:
+        """Function to load file"""
+        try:
+            current_song_obj = pygame.mixer.Sound(filename)
+            self.current_song_file = filename
+            pygame.mixer.music.load(filename)
+            self.total_length = current_song_obj.get_length()
+        except RuntimeError:
+            print("Error loading file")
+            return False
+        return True
+
+    def play(self) -> None:
+        """Function to play music"""
         pygame.mixer.music.play()
-    except RuntimeError:
-        print("Error playing music from file")
-        return False
-    return True
+        self.playing = True
 
+    def pause(self) -> None:
+        """Function to pause music"""
+        pygame.mixer.music.pause()
+        self.playing = False
 
-def pause() -> None:
-    """Function to pause music"""
-    pygame.mixer.music.pause()
+    def set_volume(self, volume: float) -> None:
+        """Sets volumes"""
+        self.volume = volume
+        pygame.mixer.music.set_volume(volume)
 
-
-def add_to_queue(filename: str) -> None:
-    """Function to add to queue"""
-    try:
-        pygame.mixer.music.queue(filename)
-    except RuntimeError:
-        print("File not found or error encountered while loading file")
-        return False
-    return True
-
-
-def get_position() -> int:
-    """Function to return position in music"""
-    return pygame.mixer.music.get_pos()
+    def get_percent(self) -> int:
+        """Gets percent of song passed"""
+        self.current_length = pygame.mixer.music.get_pos()
+        return int((self.current_length / (self.total_length*1000)) * 100)
