@@ -1,7 +1,7 @@
 from os import getcwd, listdir
-from os.path import isdir, isfile, join
+from os.path import isdir, isfile, join, splitext
 
-valid_file_extensions = ["mp3"]
+valid_file_extensions = [".mp3", ".wav", ".ogg", ".flac"]
 
 
 class FileHandler:
@@ -21,8 +21,12 @@ class FileHandler:
 
     def get_files(self) -> None:
         """Gets files in the current working directory and returns it as a list of files names"""
-        # TODO: add valid file extensions, a recursive check in the current cwd for music files (optional flag)
-        self.files = [file for file in listdir(self.working_directory) if isfile(join(self.working_directory, file))]
+        self.files = []
+        for file in listdir(self.working_directory):
+            if isfile(join(self.working_directory, file)):
+                ext = splitext(file)[1]
+                if ext in valid_file_extensions:
+                    self.files.append(file)
         self.amt_of_files = len(self.files)
         return
 
