@@ -12,6 +12,7 @@ from FileHandling import FileHandler
 from music import MusicPlayer
 from defaults import JsonConfigHandler
 from os import getcwd
+import signal
 
 CODES=blessed.keyboard.get_keyboard_codes()
 
@@ -124,6 +125,9 @@ class MusicTerminal:
         self.term=terminal
         self.event_subscribers=[]
         self.widgetfocus=0
+        signal.signal(signal.SIGWINCH, self.on_resize)
+    def on_resize(self,*args):
+        self.render()
 
     def run(self):
         self.render()
@@ -145,8 +149,10 @@ class MusicTerminal:
     def render(self):
         self.widgets.sort(key=lambda x:x['pos'][0])
         screen=[]
-        for i in range(10):
+        for i in range(term.height):
             screen.append(' '*term.width)
+        screen[1]='='*term.width
+        screen[-1]='='*term.width
 
         for w in self.widgets:
             x=w["pos"][0]
@@ -199,10 +205,10 @@ if __name__ == "__main__":
     # o5 = Option(["Breath"], "Breath.mp3")
     # options2 = [o1, o2, o3, o4, o5]
 
-    # controls=SelectWidget([Option(["     ", " <<< ", "     "], "previous"),
-    #                   Option(["      ", " play ", "      "], "play"),
-    #                   Option(["       ", " Pause ", "       "], "pause"),
-    #                   Option(["     ", " >>> ", "     "], "next")])
+    controls=SelectWidget([Option(["     ", " <<< ", "     "], "previous"),
+                           Option(["      ", " play ", "      "], "play"),
+                           Option(["       ", " Pause ", "       "], "pause"),
+                           Option(["     ", " >>> ", "     "], "next")],layout="Horizontal")
 
     fh=FileHandler(MUSIC_DIR)
     files=fh.files
@@ -212,10 +218,11 @@ if __name__ == "__main__":
     music_menu = SelectWidget(filenames)
 
 
-    controls=SelectWidget([Option([" <<< "], "previous"),
-                      Option([" play "], "play"),
-                      Option([" Pause "], "pause"),
-                      Option([" >>> "], "next")],layout="Horizontal")
+
+    # controls=SelectWidget([Option([" <<< "], "previous"),
+    #                   Option([" play "], "play"),
+    #                   Option([" Pause "], "pause"),
+    #                   Option([" >>> "], "next")],layout="Horizontal")
     controls.name='controls'
 
     volct=SelectWidget([Option(['x'], "0"),
@@ -230,8 +237,8 @@ if __name__ == "__main__":
     printevent=EventSubscriber()
 
     m=MusicTerminal(term)
-    m.add_widget(music_menu,  (1,0))
-    m.add_widget(controls, (len(music_menu.options)+3,0))
-    m.add_widget(volct, (len(music_menu.options)+2,1))
+    m.add_widget(music_menu,  (2,0))
+    m.add_widget(controls, (len(music_menu.options)+4,0))
+    m.add_widget(volct, (len(music_menu.options)+3,1))
     m.add_event_subscriber(printevent)
     m.run()
