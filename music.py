@@ -1,8 +1,8 @@
+from signal import pause
 import pygame
 
 pygame.init()
 pygame.mixer.init()
-
 
 class MusicPlayer:
     """Music player class for handling music"""
@@ -14,6 +14,7 @@ class MusicPlayer:
         self.playing = False
         self.total_length = 1
         self.volume = 1
+        self.paused = pygame.mixer.music.get_busy() 
 
     def load_file(self, filename: str) -> bool:
         """Function to load file"""
@@ -30,14 +31,16 @@ class MusicPlayer:
     def play(self) -> None:
         """Function to play music"""
         pygame.mixer.music.play()
-        self.playing = True
-        return
 
     def pause(self) -> None:
-        """Function to pause music"""
+        """Function to pause music""" 
         pygame.mixer.music.pause()
         self.playing = False
-        return
+
+    def unpause(self) -> None:
+        """Function to unpause music"""
+        pygame.mixer.music.unpause()
+        self.playing = True
 
     # TODO: next song and other controls
     # TODO: clean song data
