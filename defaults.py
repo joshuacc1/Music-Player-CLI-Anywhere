@@ -13,7 +13,7 @@ class JsonConfigHandler:
         self.load_and_read()
 
     def load_and_read(self) -> typing.List[typing.AnyStr]:
-        """loads and parses a JSON"""
+        """Loads and parses a JSON"""
         f = json.load(
             open(
                 f"{self.config}",
