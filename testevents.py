@@ -274,20 +274,29 @@ class MusicTerminal:
         return maxypos, maxxpos
 
 
-class EventSubscriber:
+class MusicEventHandler:
     """Example subscriber of app events"""
 
     def __init__(self):
         self.currentsong = ''
         self.musicplayer = MusicPlayer()
+        self.queue = []
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
-        print(event)
-        # songfile=event[0]
-        # if not songfile == self.currentsong:
-        #     self.currentsong = songfile
-        #     self.musicplayer.load_file(MUSIC_DIR + songfile)
+        songfile=event['filename']
+        event_type = event['controls']
+        if event_type == "play":
+            if not songfile == self.currentsong: #If a song hasn't been selected already
+                self.currentsong = songfile
+                self.queue.append(songfile)
+                self.musicplayer.load_file(MUSIC_DIR + songfile)
+                self.musicplayer.play()
+            else:
+                self.musicplayer.unpause()
+
+        elif event_type == "pause":
+            self.musicplayer.pause()
 
 
 if __name__ == "__main__":
@@ -331,7 +340,7 @@ if __name__ == "__main__":
     progressbar = ProgessBarWidget('progressbar', 10, term)
     progressbar.length = 10
 
-    printevent = EventSubscriber()
+    printevent = MusicEventHandler()
 
     m = MusicTerminal(term)
     m.add_widget(music_menu, (2, 2))
