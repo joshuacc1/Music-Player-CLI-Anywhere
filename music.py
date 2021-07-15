@@ -1,8 +1,8 @@
-from signal import pause
 import pygame
 
 pygame.init()
 pygame.mixer.init()
+
 
 class MusicPlayer:
     """Music player class for handling music"""
@@ -14,18 +14,18 @@ class MusicPlayer:
         self.playing = False
         self.total_length = 1
         self.volume = 1
-        self.paused = pygame.mixer.music.get_busy() 
+        self.paused = pygame.mixer.music.get_busy()
 
     def load_file(self, filename: str) -> bool:
         """Function to load file"""
-        #try:
+        # try:
         current_song_obj = pygame.mixer.Sound(filename)
         self.current_song_file = filename
         pygame.mixer.music.load(filename)
         self.total_length = current_song_obj.get_length() * 1000
-        #except RuntimeError:
-            # print("Error loading file")
-            # return False
+        # except RuntimeError:
+        # print("Error loading file")
+        # return False
         return True
 
     def play(self) -> None:
@@ -33,7 +33,7 @@ class MusicPlayer:
         pygame.mixer.music.play()
 
     def pause(self) -> None:
-        """Function to pause music""" 
+        """Function to pause music"""
         pygame.mixer.music.pause()
         self.playing = False
 
