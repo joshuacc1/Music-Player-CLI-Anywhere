@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-import signal
 
-# local
+
 import blessed.keyboard
 from blessed import Terminal
-
 from defaults import JsonConfigHandler
 from FileHandling import FileHandler
 from music import MusicPlayer
+import signal
 
 CODES = blessed.keyboard.get_keyboard_codes()
 
