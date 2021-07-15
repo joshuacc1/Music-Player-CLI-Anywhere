@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import blessed.keyboard
-import signal
 from blessed import Terminal
+
+import signal
 from defaults import JsonConfigHandler
 from FileHandling import FileHandler
 from music import MusicPlayer
