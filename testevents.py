@@ -33,8 +33,34 @@ class Option:
 class Widget:
     """Generic widget class"""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str = '', passive: bool = False):
         self.name = name
+        self.passive = passive
+
+
+class ProgessBarWidget(Widget):
+    """Progress bar for showing progress"""
+
+    def __init__(self, name: str = '', length: int = 5, terminal: Terminal = None):
+        Widget.__init__(self, name, True)
+        self.term = terminal if terminal else blessed.terminal
+        self.length = length
+        self.fillstyle = term.on_white
+        self.progress = 4
+
+    def render_lines(self) -> list:
+        """Returns lines to be rendered"""
+        lines = list()
+        lines.append(chr(9556) + chr(9552) * self.length + chr(9559))
+        lines.append(chr(9553) + f'{self.fillstyle}' + ' '*self.progress + f'{self.term.normal}' + ' '
+                     * (self.length-self.progress) + chr(9553))
+        lines.append(chr(9562) + chr(9552) * self.length + chr(9565))
+        return lines
+
+    def update(self, events: dict) -> None:
+        """Update the progress bar with song progress"""
+        print(events['progress'])
+        self.progress = events['progress']
 
 
 class SelectWidget(Widget):
@@ -142,6 +168,7 @@ class MusicTerminal:
 
     def __init__(self, terminal: Terminal):
         self.widgets = []
+        self.passive_widgets = []
         self.term = terminal
         self.event_subscribers = []
         self.widgetfocus = 0
@@ -160,23 +187,28 @@ class MusicTerminal:
             while val.lower() != "q":
                 val = term.inkey(timeout=3)
                 if val:
-                    self.notifywidget(val)
-                    self.render()
-                    if CODES[val.code] == 'KEY_ENTER':
-                        self.push_events({w['widget'].name: w['widget'].choice() for w in self.widgets})
-                    if CODES[val.code] == 'KEY_TAB':
-                        self.widgetfocus = (self.widgetfocus + 1) % len(self.widgets)
+                    if val.is_sequence:
+                        self.notifywidget(val)
+                        self.render()
+                        if CODES[val.code] == 'KEY_ENTER':
+                            self.push_events({w['widget'].name: w['widget'].choice() for w in self.widgets})
+                        if CODES[val.code] == 'KEY_TAB':
+                            self.widgetfocus = (self.widgetfocus + 1) % len(self.widgets)
+                    # if str(val) in [str(i) for i in range(10)]:
+                    #     self.passive_widgets[0]['widget'].update({'progress': int(str(val))})
+                    #     self.render()
 
     def render(self) -> None:
         """Renders the graphics to screen"""
-        self.widgets.sort(key=lambda x: x['pos'][0])
+        all_widgets = [*self.widgets, *self.passive_widgets]
+        all_widgets.sort(key=lambda x: x['pos'][0])
         screen = []
         for i in range(term.height):
             screen.append(' ' * term.width)
         screen[1] = '=' * term.width
         screen[-1] = '=' * term.width
 
-        for w in self.widgets:
+        for w in all_widgets:
             x = w["pos"][0]
             y = w['pos'][1]
             widgetlines = w['widget'].render_lines()
@@ -189,7 +221,10 @@ class MusicTerminal:
 
     def add_widget(self, widget: Widget, position: tuple) -> None:
         """Adds a widget to the app"""
-        self.widgets.append({'widget': widget, 'pos': position})
+        if widget.passive:
+            self.passive_widgets.append({'widget': widget, 'pos': position})
+        else:
+            self.widgets.append({'widget': widget, 'pos': position})
 
     def add_event_subscriber(self, subscriber: object) -> None:
         """Adds a subscriber to app events"""
@@ -209,6 +244,13 @@ class MusicTerminal:
         """Updates all subscribers of app events"""
         for es in self.event_subscribers:
             es.update(events)
+
+    def minimum_window_size(self) -> tuple:
+        """Gets the minimum window size to fit all widgets"""
+        allwidgets = [*self.widgets, *self.passive_widgets]
+        maxypos = max([x['pos'][0] for x in allwidgets])
+        maxxpos = max([x['pos'][1] for x in allwidgets])
+        return (maxxpos, maxypos)
 
 
 class EventSubscriber:
@@ -265,11 +307,16 @@ if __name__ == "__main__":
     volct.header = 'Volume: ' + term.on_green
     volct.name = 'volume'
 
+    progressbar = ProgessBarWidget('progressbar', 10, term)
+    progressbar.length = 10
+
     printevent = EventSubscriber()
 
     m = MusicTerminal(term)
-    m.add_widget(music_menu, (2, 0))
-    m.add_widget(controls, (len(music_menu.options) + 4, 0))
-    m.add_widget(volct, (len(music_menu.options) + 3, 1))
+    m.add_widget(music_menu, (2, 2))
+    m.add_widget(progressbar, (len(music_menu.options) + 4, 2))
+    m.add_widget(volct, (len(music_menu.options) + 7, 2))
+    m.add_widget(controls, (len(music_menu.options) + 8, 2))
+
     m.add_event_subscriber(printevent)
     m.run()
