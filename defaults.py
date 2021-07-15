@@ -4,8 +4,7 @@ import typing
 
 
 class JsonConfigHandler:
-    """Json Management class"""
-    
+    """JSON Management class"""
     
     def __init__(self, config: str):
         self.config = config  # config file path
