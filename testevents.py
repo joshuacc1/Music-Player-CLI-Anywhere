@@ -281,15 +281,17 @@ class MusicEventHandler:
         self.currentsong = ''
         self.musicplayer = MusicPlayer()
         self.queue = []
+        self.queue_pointer = 0
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
         songfile=event['filename']
         event_type = event['controls']
         if event_type == "play":
+            self.queue = FileHandler(MUSIC_DIR).files
+            print(event)
             if not songfile == self.currentsong: #If a song hasn't been selected already
                 self.currentsong = songfile
-                self.queue.append(songfile)
                 self.musicplayer.load_file(MUSIC_DIR + songfile)
                 self.musicplayer.play()
             else:
@@ -297,6 +299,18 @@ class MusicEventHandler:
 
         elif event_type == "pause":
             self.musicplayer.pause()
+
+        elif event_type == "next" and len(self.queue)!=0:
+            self.queue_pointer+=(self.queue.index(songfile)+1)
+            self.queue_pointer = self.queue_pointer%len(self.queue)
+            self.musicplayer.load_file(MUSIC_DIR+self.queue[self.queue_pointer])
+            self.musicplayer.play()
+
+        elif event_type == "previous" and len(self.queue)!=0:
+            self.queue_pointer += self.queue.index(songfile)-1
+            self.queue_pointer = self.queue_pointer%len(self.queue)
+            self.musicplayer.load_file(MUSIC_DIR+self.queue[self.queue_pointer])
+            self.musicplayer.play()
 
 
 if __name__ == "__main__":
