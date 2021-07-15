@@ -9,7 +9,6 @@ from defaults import JsonConfigHandler
 from FileHandling import FileHandler
 from music import MusicPlayer
 
-
 CODES = blessed.keyboard.get_keyboard_codes()
 
 MUSIC_DIR = JsonConfigHandler('config.json').default_dir
@@ -219,7 +218,7 @@ class MusicTerminal:
             print(self.term.clear + self.small_window_widget.render_lines()[0])
             return None
         all_widgets = [*self.widgets, *self.passive_widgets]
-        all_widgets.sort(key=lambda x: x['pos'][0])
+        all_widgets.sort(key=lambda item: item['pos'][0])
         screen = []
         for i in range(term.height):
             screen.append(' ' * term.width)
