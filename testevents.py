@@ -169,17 +169,27 @@ class MusicTerminal:
     def __init__(self, terminal: Terminal):
         self.widgets = []
         self.passive_widgets = []
+        self.small_window_widget = None
         self.term = terminal
         self.event_subscribers = []
         self.widgetfocus = 0
+        self.min_win_size = (0, 0)
+        self.miniwindow = False
+
         signal.signal(signal.SIGWINCH, self.on_resize)
 
     def on_resize(self, *args) -> None:
         """Executes when windows size changes"""
-        self.render()
+        if self.term.height > self.minimum_window_size()[0]:
+            self.miniwindow = False
+            self.render()
+        else:
+            self.miniwindow = True
+            self.render()
 
     def run(self) -> None:
         """Runs the app"""
+        self.min_win_size = self.minimum_window_size()
         self.render()
         with term.cbreak():
             # print(term.clear())
@@ -191,7 +201,12 @@ class MusicTerminal:
                         self.notifywidget(val)
                         self.render()
                         if CODES[val.code] == 'KEY_ENTER':
-                            self.push_events({w['widget'].name: w['widget'].choice() for w in self.widgets})
+                            if self.miniwindow:
+                                events = {w['widget'].name: w['widget'].choice() for w in self.widgets}
+                                events[self.small_window_widget.name] = self.small_window_widget.choice()
+                                self.push_events(events)
+                            else:
+                                self.push_events({w['widget'].name: w['widget'].choice() for w in self.widgets})
                         if CODES[val.code] == 'KEY_TAB':
                             self.widgetfocus = (self.widgetfocus + 1) % len(self.widgets)
                     # if str(val) in [str(i) for i in range(10)]:
@@ -200,6 +215,9 @@ class MusicTerminal:
 
     def render(self) -> None:
         """Renders the graphics to screen"""
+        if self.miniwindow:
+            print(self.term.clear + self.small_window_widget.render_lines()[0])
+            return None
         all_widgets = [*self.widgets, *self.passive_widgets]
         all_widgets.sort(key=lambda x: x['pos'][0])
         screen = []
@@ -238,7 +256,10 @@ class MusicTerminal:
 
     def notifywidget(self, keystroke: blessed.keyboard.Keystroke) -> None:
         """Notify a single widget"""
-        self.widgets[self.widgetfocus]['widget'].update(keystroke)
+        if self.miniwindow:
+            self.small_window_widget.update(keystroke)
+        else:
+            self.widgets[self.widgetfocus]['widget'].update(keystroke)
 
     def push_events(self, events: dict) -> None:
         """Updates all subscribers of app events"""
@@ -248,9 +269,9 @@ class MusicTerminal:
     def minimum_window_size(self) -> tuple:
         """Gets the minimum window size to fit all widgets"""
         allwidgets = [*self.widgets, *self.passive_widgets]
-        maxypos = max([x['pos'][0] for x in allwidgets])
-        maxxpos = max([x['pos'][1] for x in allwidgets])
-        return (maxxpos, maxypos)
+        maxypos = max([x['pos'][0] + len(x['widget'].render_lines()) for x in allwidgets])
+        maxxpos = max([x['pos'][1] + max([len(line) for line in x['widget'].render_lines()]) for x in allwidgets])
+        return maxypos, maxxpos
 
 
 class EventSubscriber:
@@ -292,10 +313,10 @@ if __name__ == "__main__":
     music_menu = SelectWidget(filenames)
     music_menu.name = 'filename'
 
-    # controls=SelectWidget([Option([" <<< "], "previous"),
-    #                   Option([" play "], "play"),
-    #                   Option([" Pause "], "pause"),
-    #                   Option([" >>> "], "next")],layout="Horizontal")
+    mini_controls = SelectWidget([Option([" <<< "], "previous"),
+                                  Option([" play "], "play"),
+                                  Option([" Pause "], "pause"),
+                                  Option([" >>> "], "next")], layout="Horizontal")
     controls.name = 'controls'
 
     volct = SelectWidget([Option(['x'], "0"),
@@ -317,6 +338,7 @@ if __name__ == "__main__":
     m.add_widget(progressbar, (len(music_menu.options) + 4, 2))
     m.add_widget(volct, (len(music_menu.options) + 7, 2))
     m.add_widget(controls, (len(music_menu.options) + 8, 2))
+    m.small_window_widget = mini_controls
 
     m.add_event_subscriber(printevent)
     m.run()
