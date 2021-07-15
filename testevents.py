@@ -285,7 +285,6 @@ class MusicEventHandler:
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
-
         songfile = event['filename']
         event_type = event['controls']
         if event_type == "play":
