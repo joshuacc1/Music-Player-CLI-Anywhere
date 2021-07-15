@@ -1,4 +1,9 @@
+import os
+
 import pygame
+
+from FileHandling import FileHandler
+from Widgets import Widget
 
 pygame.init()
 pygame.mixer.init()
@@ -18,19 +23,17 @@ class MusicPlayer:
 
     def load_file(self, filename: str) -> bool:
         """Function to load file"""
-        # try:
-        current_song_obj = pygame.mixer.Sound(filename)
-        self.current_song_file = filename
-        pygame.mixer.music.load(filename)
-        self.total_length = current_song_obj.get_length() * 1000
-        # except RuntimeError:
-        # print("Error loading file")
-        # return False
+        try:
+            current_song_obj = pygame.mixer.Sound(filename)
+            self.current_song_file = filename
+            pygame.mixer.music.load(filename)
+            self.total_length = current_song_obj.get_length() * 1000
+            pygame.mixer.music.play()
+        except FileNotFoundError as err:
+            print("File Not Found Error: {0}".format(err))
+            print(filename + " not found!")
+            return False
         return True
-
-    def play(self) -> None:
-        """Function to play music"""
-        pygame.mixer.music.play()
 
     def pause(self) -> None:
         """Function to pause music"""
@@ -59,3 +62,42 @@ class MusicPlayer:
         """Gets percent of song passed"""
         self.current_length = pygame.mixer.music.get_pos()
         return int((self.current_length / self.total_length) * 100)
+
+
+class MusicEventHandler:
+    """Music Event subscriber of app events"""
+
+    def __init__(self, music_dir: str, progress_bar: Widget):
+        self.currentsong = ''
+        self.musicplayer = MusicPlayer()
+        self.queue = []
+        self.queue_pointer = 0
+        self.percent = 0
+        self.dir = music_dir
+        self.progress_bar = progress_bar
+
+    def update(self, event: dict) -> None:
+        """Called when app subscribed to has an event"""
+        songfile = event['filename']
+        event_type = event['controls']
+
+        if event_type == "play":
+            self.queue = FileHandler(self.dir).files
+            if not songfile == self.currentsong:  # If a song hasn't been selected already
+                self.currentsong = songfile
+                self.musicplayer.load_file(self.dir + os.path.sep + songfile)
+            else:
+                self.musicplayer.unpause()
+
+        elif event_type == "pause":
+            self.musicplayer.pause()
+
+        elif event_type == "next" and len(self.queue) != 0:
+            self.queue_pointer += (self.queue.index(songfile) + 1)
+            self.queue_pointer = self.queue_pointer % len(self.queue)
+            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+
+        elif event_type == "previous" and len(self.queue) != 0:
+            self.queue_pointer += self.queue.index(songfile) - 1
+            self.queue_pointer = self.queue_pointer % len(self.queue)
+            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
