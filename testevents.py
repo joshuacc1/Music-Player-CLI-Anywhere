@@ -60,4 +60,5 @@ if __name__ == "__main__":
     m.small_window_widget = mini_controls
 
     m.add_event_subscriber(music_event)
+    music_event.add_publisher(progressbar)
     m.run()

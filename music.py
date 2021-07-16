@@ -76,6 +76,7 @@ class MusicEventHandler:
         self.percent = 0
         self.dir = music_dir
         self.progress_bar = progress_bar
+        self.event_publishers = []
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
@@ -104,3 +105,13 @@ class MusicEventHandler:
                 self.queue_pointer += self.queue.index(songfile) - 1
                 self.queue_pointer = self.queue_pointer % len(self.queue)
                 self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+
+    async def run(self) -> None:
+        while True:
+            progress=self.musicplayer.get_percent()
+            events={'progress':progress}
+            for event_publisher in self.event_publishers:
+                event_publisher.update(events)
+
+    def add_publisher(self, publisher:Widget) -> None:
+        self.event_publishers.append(publisher)
