@@ -33,7 +33,7 @@ class MusicTerminal:
             self.miniwindow = True
             self.render()
 
-    def run(self) -> None:
+    async def run(self) -> None:
         """Runs the app"""
         self.min_win_size = self.minimum_window_size()
         self.render()

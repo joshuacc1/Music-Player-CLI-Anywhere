@@ -108,10 +108,10 @@ class MusicEventHandler:
 
     async def run(self) -> None:
         while True:
-            progress=self.musicplayer.get_percent()
-            events={'progress':progress}
+            progress = 1
+            events = {'progress': progress}
             for event_publisher in self.event_publishers:
                 event_publisher.update(events)
 
-    def add_publisher(self, publisher:Widget) -> None:
+    def add_publisher(self, publisher: Widget) -> None:
         self.event_publishers.append(publisher)
