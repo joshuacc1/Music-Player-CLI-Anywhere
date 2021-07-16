@@ -29,6 +29,9 @@ if __name__ == "__main__":
     fh = FileHandler(MUSIC_DIR)
     files = fh.files
     filenames = []
+
+    for folder in fh.folders:
+        filenames.append(Option([term.blue(folder)], folder))
     for file in files:
         filenames.append(Option([file], file))
     music_menu = SelectWidget(filenames, terminal=term)
