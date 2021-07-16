@@ -52,6 +52,7 @@ if __name__ == "__main__":
     progressbar = ProgressBarWidget('progressbar', 10, terminal=term)
 
     music_event = MusicEventHandler(MUSIC_DIR, progress_bar=progressbar)
+    music_event.run()
 
     m.add_widget(music_menu, (2, 2))
     m.add_widget(music_event.progress_bar, (len(music_menu.options) + 4, 2))
