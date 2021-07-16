@@ -29,8 +29,8 @@ class FileHandler:
                 if ext in valid_file_extensions:
                     self.files.append(file)
             else:
-                self.files.append(file)
-        self.amt_of_files = len(self.files)
+                self.folders.append(file)
+        self.amt_of_files = len(self.files)+len(self.folders)
         return
 
     def set_working_directory(self, new_directory: str) -> None:

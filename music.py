@@ -5,10 +5,12 @@ import pygame
 
 from FileHandling import FileHandler
 from Widgets import Widget
+from defaults import JsonConfigHandler
 
 pygame.init()
 pygame.mixer.init()
 
+MUSIC_DIR = JsonConfigHandler('config.json').default_dir
 
 class MusicPlayer:
     """Music player class for handling music"""
@@ -76,6 +78,7 @@ class MusicEventHandler:
         self.percent = 0
         self.dir = music_dir
         self.progress_bar = progress_bar
+        fh = FileHandler(MUSIC_DIR)
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
@@ -83,6 +86,7 @@ class MusicEventHandler:
         event_type = event['controls']
         if isdir(self.dir + songfile):
             os.chdir(self.dir+songfile)
+
         else:
             if event_type == "play":
                 self.queue = FileHandler(self.dir).files
