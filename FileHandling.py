@@ -42,5 +42,6 @@ class FileHandler:
             print("Not a valid working directory")
         return
 
-    def update(self,events):
+    def update(self, events: list) -> None:
+        """Update function to update from events"""
         print(events)
