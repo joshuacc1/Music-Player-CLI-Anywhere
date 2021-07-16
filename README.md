@@ -4,13 +4,13 @@
 Hello code jam participants! We've put together this repository template for you to use in [our code jams](https://pythondiscord.com/events/) or even other Python events!
 
 This document will contain the following information:
-1. [What does this template contain?](#what-does-this-template-contain)
+1. [About](#About)
 2. [How do I use it?](#how-do-i-use-it)
 3. [How do I adapt it to my project?](#how-do-i-adapt-it-to-my-project)
 
 You can also look at [our style guide](https://pythondiscord.com/events/code-jams/code-style-guide/) to get more information about what we consider a maintainable code style.
 
-## What does this template contain?
+## About
 
 Here is a quick rundown of what each file in this repository contains:
 - `LICENSE`: [The MIT License](https://opensource.org/licenses/MIT), an OSS approved license which grants rights to everyone to use and modify your projects and limits your liability. We highly recommend you to read the license.
