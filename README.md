@@ -1,5 +1,4 @@
-# Python Discord Code Jam Repository Template
-
+# CUI Anywhere Music Player (CAMP)
 ## Outline
 
 This document will contain the following information:
