@@ -41,3 +41,6 @@ class FileHandler:
         else:
             print("Not a valid working directory")
         return
+
+    def update(self,events):
+        print(events)
