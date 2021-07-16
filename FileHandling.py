@@ -14,6 +14,7 @@ class FileHandler:
             self.working_directory = getcwd()
 
         self.files = []
+        self.folders = []
         self.amt_of_files = 0
 
         if isdir(self.working_directory):
@@ -27,6 +28,8 @@ class FileHandler:
                 ext = splitext(file)[1]
                 if ext in valid_file_extensions:
                     self.files.append(file)
+            else:
+                self.files.append(file)
         self.amt_of_files = len(self.files)
         return
 

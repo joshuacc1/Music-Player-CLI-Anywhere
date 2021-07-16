@@ -1,3 +1,4 @@
+from genericpath import isdir
 import os
 
 import pygame
@@ -80,24 +81,26 @@ class MusicEventHandler:
         """Called when app subscribed to has an event"""
         songfile = event['filename']
         event_type = event['controls']
+        if isdir(self.dir + songfile):
+            os.chdir(self.dir+songfile)
+        else:
+            if event_type == "play":
+                self.queue = FileHandler(self.dir).files
+                if not songfile == self.currentsong:  # If a song hasn't been selected already
+                    self.currentsong = songfile
+                    self.musicplayer.load_file(self.dir + os.path.sep + songfile)
+                else:
+                    self.musicplayer.unpause()
 
-        if event_type == "play":
-            self.queue = FileHandler(self.dir).files
-            if not songfile == self.currentsong:  # If a song hasn't been selected already
-                self.currentsong = songfile
-                self.musicplayer.load_file(self.dir + os.path.sep + songfile)
-            else:
-                self.musicplayer.unpause()
+            elif event_type == "pause":
+                self.musicplayer.pause()
 
-        elif event_type == "pause":
-            self.musicplayer.pause()
+            elif event_type == "next" and len(self.queue) != 0:
+                self.queue_pointer += (self.queue.index(songfile) + 1)
+                self.queue_pointer = self.queue_pointer % len(self.queue)
+                self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
 
-        elif event_type == "next" and len(self.queue) != 0:
-            self.queue_pointer += (self.queue.index(songfile) + 1)
-            self.queue_pointer = self.queue_pointer % len(self.queue)
-            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
-
-        elif event_type == "previous" and len(self.queue) != 0:
-            self.queue_pointer += self.queue.index(songfile) - 1
-            self.queue_pointer = self.queue_pointer % len(self.queue)
-            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+            elif event_type == "previous" and len(self.queue) != 0:
+                self.queue_pointer += self.queue.index(songfile) - 1
+                self.queue_pointer = self.queue_pointer % len(self.queue)
+                self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
