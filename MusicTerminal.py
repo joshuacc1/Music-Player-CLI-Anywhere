@@ -1,4 +1,3 @@
-import asyncio
 import os
 import signal
 
@@ -44,7 +43,8 @@ class MusicTerminal:
             val = ""
             while val.lower() != "q":
                 for pub in self.dummypublishers:
-                    if pub.run(): self.render()
+                    if pub.run():
+                        self.render()
 
                 val = self.term.inkey(timeout=3)
 

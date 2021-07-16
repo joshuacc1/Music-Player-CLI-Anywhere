@@ -1,8 +1,7 @@
-import asyncio
-from genericpath import isdir
 import os
 
 import pygame
+from genericpath import isdir
 
 from FileHandling import FileHandler
 from Widgets import Widget
@@ -110,6 +109,7 @@ class MusicEventHandler:
                 self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
 
     def run(self) -> bool:
+        """Updates progress bar"""
         progress = self.musicplayer.get_percent()
         if not self.progress == progress:
             events = {'progress': progress}
@@ -119,4 +119,5 @@ class MusicEventHandler:
         return False
 
     def add_publisher(self, publisher: Widget) -> None:
+        """Publishes events for the event"""
         self.event_publishers.append(publisher)

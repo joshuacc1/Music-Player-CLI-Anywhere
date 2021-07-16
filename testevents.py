@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import asyncio
 from blessed import Terminal
 
 from defaults import JsonConfigHandler
@@ -55,7 +54,6 @@ if __name__ == "__main__":
     progressbar = ProgressBarWidget('progressbar', 20, terminal=term)
 
     music_event = MusicEventHandler(MUSIC_DIR, progress_bar=progressbar)
-
 
     m.add_widget(music_menu, (2, 2))
     m.add_widget(music_event.progress_bar, (len(music_menu.options) + 4, 2))

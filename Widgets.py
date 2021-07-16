@@ -1,4 +1,3 @@
-import asyncio
 import blessed
 
 CODES = blessed.keyboard.get_keyboard_codes()
@@ -48,8 +47,8 @@ class ProgressBarWidget(Widget):
 
     def update(self, events: dict) -> None:
         """Update the progress bar with song progress"""
-        if 0 <= int(events['progress'] * self.length /  100) <= self.length:
-            self.progress = int(events['progress'] * self.length /  100)
+        if 0 <= int(events['progress'] * self.length / 100) <= self.length:
+            self.progress = int(events['progress'] * self.length / 100)
 
 
 class SelectWidget(Widget):
