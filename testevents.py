@@ -52,7 +52,7 @@ if __name__ == "__main__":
     volct.header = 'Volume: ' + term.on_green
     volct.name = 'volume'
 
-    progressbar = ProgressBarWidget('progressbar', 10, terminal=term)
+    progressbar = ProgressBarWidget('progressbar', 20, terminal=term)
 
     music_event = MusicEventHandler(MUSIC_DIR, progress_bar=progressbar)
 
@@ -64,9 +64,6 @@ if __name__ == "__main__":
     m.small_window_widget = mini_controls
 
     m.add_event_subscriber(music_event)
+    m.dummypublishers.append(music_event)
     music_event.add_publisher(progressbar)
-    loop = asyncio.get_event_loop()
-    loop.create_task(m.run())
-    loop.create_task(music_event.run())
-    loop.run_forever()
-
+    m.run()

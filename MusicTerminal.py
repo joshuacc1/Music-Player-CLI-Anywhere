@@ -1,3 +1,4 @@
+import asyncio
 import os
 import signal
 
@@ -23,6 +24,7 @@ class MusicTerminal:
         self.miniwindow = False
         if os.name != 'nt':
             signal.signal(signal.SIGWINCH, self.on_resize)
+        self.dummypublishers = []
 
     def on_resize(self, *args) -> None:
         """Executes when windows size changes"""
@@ -33,7 +35,7 @@ class MusicTerminal:
             self.miniwindow = True
             self.render()
 
-    async def run(self) -> None:
+    def run(self) -> None:
         """Runs the app"""
         self.min_win_size = self.minimum_window_size()
         self.render()
@@ -41,6 +43,9 @@ class MusicTerminal:
             # print(term.clear())
             val = ""
             while val.lower() != "q":
+                for pub in self.dummypublishers:
+                    if pub.run(): self.render()
+
                 val = self.term.inkey(timeout=3)
 
                 # check for pressed values

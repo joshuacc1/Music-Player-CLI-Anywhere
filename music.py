@@ -1,3 +1,4 @@
+import asyncio
 from genericpath import isdir
 import os
 
@@ -21,6 +22,7 @@ class MusicPlayer:
         self.total_length = 1
         self.volume = 1
         self.paused = pygame.mixer.music.get_busy()
+        self.dummypublishers = []
 
     def load_file(self, filename: str) -> bool:
         """Function to load file"""
@@ -76,6 +78,7 @@ class MusicEventHandler:
         self.percent = 0
         self.dir = music_dir
         self.progress_bar = progress_bar
+        self.progress = 0
         self.event_publishers = []
 
     def update(self, event: dict) -> None:
@@ -106,12 +109,14 @@ class MusicEventHandler:
                 self.queue_pointer = self.queue_pointer % len(self.queue)
                 self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
 
-    async def run(self) -> None:
-        while True:
-            progress = 1
+    def run(self) -> bool:
+        progress = self.musicplayer.get_percent()
+        if not self.progress == progress:
             events = {'progress': progress}
             for event_publisher in self.event_publishers:
                 event_publisher.update(events)
+            return True
+        return False
 
     def add_publisher(self, publisher: Widget) -> None:
         self.event_publishers.append(publisher)

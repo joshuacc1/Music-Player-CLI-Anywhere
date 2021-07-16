@@ -35,7 +35,7 @@ class ProgressBarWidget(Widget):
         self.term = terminal if terminal else blessed.terminal
         self.length = length
         self.fillstyle = self.term.on_white
-        self.progress = 4
+        self.progress = 0
 
     def render_lines(self) -> list:
         """Returns lines to be rendered"""
@@ -48,7 +48,8 @@ class ProgressBarWidget(Widget):
 
     def update(self, events: dict) -> None:
         """Update the progress bar with song progress"""
-        self.progress = events['progress']
+        if 0 <= int(events['progress'] / self.length) <= self.length:
+            self.progress = int(events['progress']/self.length)
 
 
 class SelectWidget(Widget):
