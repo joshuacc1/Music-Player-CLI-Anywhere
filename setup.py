@@ -11,6 +11,6 @@ setup(
     packages=find_packages(),
     entry_points={"console_scripts": ["casp = casp.main:run"]},
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     long_description=long_description,
 )
