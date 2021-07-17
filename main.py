@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from blessed import Terminal
 import os
+
+from blessed import Terminal
 
 from FileHandling import FileHandler
 from music import MusicEventHandler

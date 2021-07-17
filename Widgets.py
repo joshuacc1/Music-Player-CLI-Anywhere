@@ -162,7 +162,7 @@ class SelectWidget(Widget):
             y = len(lines)
         else:
             x = self.term.length(lines[0])
-            y = max(len(line) for line in lines)
+            y = max(self.term.length(line) for line in lines)
         return x, y
 
     def choice(self) -> str:
