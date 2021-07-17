@@ -8,6 +8,7 @@ from casp.music import MusicEventHandler
 from casp.MusicTerminal import MusicTerminal
 from casp.Widgets import Option, ProgressBarWidget, SelectWidget
 
+
 def run():
     term = Terminal()
     m = MusicTerminal(term)
