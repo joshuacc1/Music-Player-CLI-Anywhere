@@ -1,4 +1,5 @@
 import blessed
+from typing import Union
 
 CODES = blessed.keyboard.get_keyboard_codes()
 
@@ -12,12 +13,12 @@ class Widget:
         self.widget_position = (0, 0)
 
     @property
-    def position(self) -> tuple[int, int]:
+    def position(self) -> Union[int, int]:
         """Position getter"""
         return self.widget_position
 
     @position.setter
-    def position(self, pos: tuple[int, int]) -> None:
+    def position(self, pos: Union[int, int]) -> None:
         """Position setter"""
         self.widget_position = pos
 
@@ -154,7 +155,7 @@ class SelectWidget(Widget):
                     phrase.append(f"{self.options[i].line(row)}")
         return phrase
 
-    def get_dimensions(self) -> tuple[int, int]:
+    def get_dimensions(self) -> Union[int, int]:
         """Gets the dimensions of the widget"""
         lines = self.render_lines()
         if self.layout == 'Horizontal':

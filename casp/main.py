@@ -8,6 +8,8 @@ from casp.music import MusicEventHandler
 from casp.MusicTerminal import MusicTerminal
 from casp.Widgets import Option, ProgressBarWidget, SelectWidget
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
 
 def run():
     term = Terminal()
@@ -21,6 +23,8 @@ def run():
 
     fh = FileHandler(MUSIC_DIR)
     files = fh.files
+    if len(files) == 0:
+        exit("No music files were found")
     filenames = []
 
     for file in files:
