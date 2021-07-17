@@ -8,7 +8,7 @@ from music import MusicEventHandler
 from MusicTerminal import MusicTerminal
 from Widgets import Option, ProgressBarWidget, SelectWidget
 
-if __name__ == "__main__":
+def main():
     term = Terminal()
     m = MusicTerminal(term)
     MUSIC_DIR = JsonConfigHandler('config.json').default_dir
