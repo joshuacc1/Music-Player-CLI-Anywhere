@@ -4,12 +4,13 @@ import os
 
 from blessed import Terminal
 
-from FileHandling import FileHandler
-from music import MusicEventHandler
-from MusicTerminal import MusicTerminal
-from Widgets import Option, ProgressBarWidget, SelectWidget
+from casp.FileHandling import FileHandler
+from casp.music import MusicEventHandler
+from casp.MusicTerminal import MusicTerminal
+from casp.Widgets import Option, ProgressBarWidget, SelectWidget
 
-if __name__ == "__main__":
+
+def run():
     term = Terminal()
     m = MusicTerminal(term)
     MUSIC_DIR = os.curdir

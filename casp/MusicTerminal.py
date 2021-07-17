@@ -4,8 +4,8 @@ import signal
 import blessed
 from blessed import Terminal, keyboard
 
-import render
-from Widgets import Widget
+from casp import render
+from casp.Widgets import Widget
 
 CODES = keyboard.get_keyboard_codes()
 
