@@ -24,7 +24,7 @@ cd Music-Player-CLI-Anywhere
 
 python -m pip install -r requirements.txt
 
-python install setup.py 
+python install setup.py
 
 ```
 

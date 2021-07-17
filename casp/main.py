@@ -12,7 +12,8 @@ from casp.Widgets import Option, ProgressBarWidget, SelectWidget
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 
-def run():
+def run() -> None:
+    """Runs the program"""
     term = Terminal()
     m = MusicTerminal(term)
     MUSIC_DIR = os.curdir
