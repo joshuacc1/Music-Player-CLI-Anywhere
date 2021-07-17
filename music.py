@@ -91,7 +91,7 @@ class MusicEventHandler:
             self.queue = FileHandler(self.dir).files
             if not songfile == self.currentsong:  # If a song hasn't been selected already
                 self.currentsong = songfile
-                self.musicplayer.load_file(self.dir + os.path.sep + songfile)
+                self.musicplayer.load_file(os.path.abspath(songfile))
             else:
                 self.musicplayer.unpause()
 

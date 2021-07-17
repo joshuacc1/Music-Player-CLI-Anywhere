@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from blessed import Terminal
+import os
 
-from defaults import JsonConfigHandler
 from FileHandling import FileHandler
 from music import MusicEventHandler
 from MusicTerminal import MusicTerminal
@@ -11,7 +11,7 @@ from Widgets import Option, ProgressBarWidget, SelectWidget
 if __name__ == "__main__":
     term = Terminal()
     m = MusicTerminal(term)
-    MUSIC_DIR = JsonConfigHandler('config.json').default_dir
+    MUSIC_DIR = os.curdir
 
     controls = SelectWidget([Option([" play "], "play"),
                              Option([" |<< "], "previous"),
