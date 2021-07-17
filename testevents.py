@@ -13,17 +13,10 @@ if __name__ == "__main__":
     m = MusicTerminal(term)
     MUSIC_DIR = JsonConfigHandler('config.json').default_dir
 
-    # o1 = Option(["abbas band"], "abbas band.mp3")
-    # o2 = Option(["the king"], "the king.mp3")
-    # o3 = Option(["flinstones"], "flinstones.mp3")
-    # o4 = Option(["superman"], "superman.mp3")
-    # o5 = Option(["Breath"], "Breath.mp3")
-    # options2 = [o1, o2, o3, o4, o5]
-
-    controls = SelectWidget([Option(["     ", " <<< ", "     "], "previous"),
-                             Option(["      ", " play ", "      "], "play"),
-                             Option(["       ", " Pause ", "       "], "pause"),
-                             Option(["     ", " >>> ", "     "], "next")], layout="Horizontal", terminal=term)
+    controls = SelectWidget([Option([" play "], "play"),
+                             Option([" |<< "], "previous"),
+                             Option([" pause "], "pause"),
+                             Option([" >>| "], "next")], layout="Horizontal", terminal=term)
 
     fh = FileHandler(MUSIC_DIR)
     files = fh.files
@@ -51,18 +44,24 @@ if __name__ == "__main__":
     volct.header = 'Volume: ' + term.on_green
     volct.name = 'volume'
 
-    progressbar = ProgressBarWidget('progressbar', 20, terminal=term)
+    progressbar = ProgressBarWidget('progressbar', term.width - 12, terminal=term)
 
     music_event = MusicEventHandler(MUSIC_DIR, progress_bar=progressbar)
-
-    m.add_widget(music_menu, (2, 2))
-    m.add_widget(music_event.progress_bar, (len(music_menu.options) + 4, 2))
-    m.add_widget(volct, (len(music_menu.options) + 7, 2))
-    m.add_widget(controls, (len(music_menu.options) + 8, 2))
+    music_menu.position = (4, 2)
+    music_menu.get_position = lambda: (4, int(m.term.width/2 - music_menu.get_dimensions()[1]/2))
+    music_event.position = (len(music_menu.options) + 4, 2)
+    volct.get_position = lambda: (m.term.height - 2, m.term.width - volct.get_dimensions()[0] - 5)
+    progressbar.get_position = lambda: (m.term.height - 6, 2)
+    controls.get_position = lambda: (m.term.height - 2, 2)
+    m.add_widget(music_menu)
+    m.add_widget(music_event.progress_bar)
+    m.add_widget(volct)
+    m.add_widget(controls)
     m.small_window_widget = mini_controls
 
     m.add_event_subscriber(music_event)
     m.add_event_subscriber(fh)
+    m.add_event_subscriber(progressbar)
     m.dummypublishers.append(music_event)
     music_event.add_publisher(progressbar)
     m.run()

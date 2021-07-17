@@ -9,6 +9,21 @@ class Widget:
     def __init__(self, name: str = '', passive: bool = False):
         self.name = name
         self.passive = passive
+        self.widget_position = (0, 0)
+
+    @property
+    def position(self) -> tuple[int, int]:
+        """Position getter"""
+        return self.widget_position
+
+    @position.setter
+    def position(self, pos: tuple[int, int]) -> None:
+        """Position setter"""
+        self.widget_position = pos
+
+    def get_position(self) -> tuple[int, int]:
+        """Gets the position can can be overloaded for dynamic position assignment"""
+        return self.position
 
 
 class Option:
@@ -35,20 +50,25 @@ class ProgressBarWidget(Widget):
         self.length = length
         self.fillstyle = self.term.on_white
         self.progress = 0
+        self.background = self.term.normal
 
     def render_lines(self) -> list:
         """Returns lines to be rendered"""
         lines = list()
-        lines.append(chr(9556) + chr(9552) * self.length + chr(9559))
-        lines.append(chr(9553) + f'{self.fillstyle}' + ' ' * self.progress + f'{self.term.normal}' + ' '
-                     * (self.length - self.progress) + chr(9553))
-        lines.append(chr(9562) + chr(9552) * self.length + chr(9565))
+        lines.append(self.background + chr(9556) + chr(9552) * self.length + chr(9559) + self.term.normal)
+        lines.append(self.background + chr(9553) + f'{self.fillstyle}' + ' ' * self.progress + f'{self.background}'
+                     + ' ' * (self.length - self.progress) + chr(9553) + self.term.normal)
+        lines.append(self.background + chr(9562) + chr(9552) * self.length + chr(9565) + self.term.normal)
         return lines
 
     def update(self, events: dict) -> None:
         """Update the progress bar with song progress"""
-        if 0 <= int(events['progress'] * self.length / 100) <= self.length:
-            self.progress = int(events['progress'] * self.length / 100)
+        if 'progress' in events.keys():
+            if 0 <= int(events['progress'] * self.length / 100) <= self.length:
+                self.progress = int(events['progress'] * self.length / 100)
+        if 'width_window' in events.keys():
+            self.length = events['width_window'] - 4
+            self.progress = int(self.progress * self.length / 100)
 
 
 class SelectWidget(Widget):
@@ -133,6 +153,17 @@ class SelectWidget(Widget):
                 else:
                     phrase.append(f"{self.options[i].line(row)}")
         return phrase
+
+    def get_dimensions(self) -> (int, int):
+        """Gets the dimensions of the widget"""
+        lines = self.render_lines()
+        if self.layout == 'Horizontal':
+            x = self.term.length(lines[0])
+            y = len(lines)
+        else:
+            x = self.term.length(lines[0])
+            y = max(len(line) for line in lines)
+        return x, y
 
     def choice(self) -> str:
         """Returns the selection of a widget"""

@@ -4,6 +4,7 @@ import signal
 import blessed
 from blessed import Terminal, keyboard
 
+import render
 from Widgets import Widget
 
 CODES = keyboard.get_keyboard_codes()
@@ -24,11 +25,15 @@ class MusicTerminal:
         if os.name != 'nt':
             signal.signal(signal.SIGWINCH, self.on_resize)
         self.dummypublishers = []
+        self.styles = render.Render()
+        self.skin_type = 'dark'
 
     def on_resize(self, *args) -> None:
         """Executes when windows size changes"""
         if self.term.height > self.minimum_window_size()[0]:
             self.miniwindow = False
+            for subscribers in self.event_subscribers:
+                subscribers.update({'width_window': self.term.width})
             self.render()
         else:
             self.miniwindow = True
@@ -55,11 +60,11 @@ class MusicTerminal:
                         self.render()
                         if CODES[val.code] == 'KEY_ENTER':
                             if self.miniwindow:
-                                events = {w['widget'].name: w['widget'].choice() for w in self.widgets}
+                                events = {w.name: w.choice() for w in self.widgets}
                                 events[self.small_window_widget.name] = self.small_window_widget.choice()
                                 self.push_events(events)
                             else:
-                                self.push_events({w['widget'].name: w['widget'].choice() for w in self.widgets})
+                                self.push_events({w.name: w.choice() for w in self.widgets})
                         if CODES[val.code] == 'KEY_TAB':
                             self.widgetfocus = (self.widgetfocus + 1) % len(self.widgets)
 
@@ -69,30 +74,33 @@ class MusicTerminal:
             print(self.term.clear + self.small_window_widget.render_lines()[0])
             return None
         all_widgets = [*self.widgets, *self.passive_widgets]
-        all_widgets.sort(key=lambda item: item['pos'][0])
+        all_widgets.sort(key=lambda item: item.get_position()[0])
+
         screen = []
         for i in range(self.term.height):
             screen.append(' ' * self.term.width)
+        screen[0] = screen[0]
         screen[1] = '=' * self.term.width
         screen[-1] = '=' * self.term.width
 
         for w in all_widgets:
-            x = w["pos"][0]
-            y = w['pos'][1]
-            widgetlines = w['widget'].render_lines()
+            pos = w.get_position()
+            x = pos[0]
+            y = pos[1]
+            widgetlines = w.render_lines()
             for row in range(len(widgetlines)):
                 start = screen[x + row][0:y] if screen[x + row][0:y] else ''
-                end = screen[x + row][y + self.term.length(widgetlines[row]):] if screen[x + row][y + self.term.length(
-                    widgetlines[row]):] else ''
+                end = screen[x + row][y + self.term.length(widgetlines[row]):] \
+                    if screen[x + row][y + self.term.length(widgetlines[row]):] else ''
                 screen[x + row] = start + widgetlines[row] + end
         print(self.term.clear + '\n'.join(screen))
 
-    def add_widget(self, widget: Widget, position: tuple) -> None:
+    def add_widget(self, widget: Widget) -> None:
         """Adds a widget to the app"""
         if widget.passive:
-            self.passive_widgets.append({'widget': widget, 'pos': position})
+            self.passive_widgets.append(widget)
         else:
-            self.widgets.append({'widget': widget, 'pos': position})
+            self.widgets.append(widget)
 
     def add_event_subscriber(self, subscriber: object) -> None:
         """Adds a subscriber to app events"""
@@ -101,15 +109,14 @@ class MusicTerminal:
     def notify(self, keystroke: blessed.keyboard.Keystroke) -> None:
         """Notify widgets of keyboard events"""
         for wp in self.widgets:
-            w = wp['widget']
-            w.update(keystroke)
+            wp.update(keystroke)
 
     def notifywidget(self, keystroke: blessed.keyboard.Keystroke) -> None:
         """Notify a single widget"""
         if self.miniwindow:
             self.small_window_widget.update(keystroke)
         else:
-            self.widgets[self.widgetfocus]['widget'].update(keystroke)
+            self.widgets[self.widgetfocus].update(keystroke)
 
     def push_events(self, events: dict) -> None:
         """Updates all subscribers of app events"""
@@ -119,6 +126,17 @@ class MusicTerminal:
     def minimum_window_size(self) -> tuple:
         """Gets the minimum window size to fit all widgets"""
         allwidgets = [*self.widgets, *self.passive_widgets]
-        maxypos = max([x['pos'][0] + len(x['widget'].render_lines()) for x in allwidgets])
-        maxxpos = max([x['pos'][1] + max([len(line) for line in x['widget'].render_lines()]) for x in allwidgets])
+        maxypos = max([x.position[0] + len(x.render_lines()) for x in allwidgets])
+        maxxpos = max([x.position[1] + max([len(line) for line in x.render_lines()]) for x in allwidgets])
         return maxypos, maxxpos
+
+    @property
+    def skin(self) -> str:
+        """Skin getter"""
+        return self.skin_type
+
+    @skin.setter
+    def skin(self, skin: str = 'dark') -> None:
+        """Skin setter"""
+        if skin in self.styles.skins:
+            self.skin_type = skin

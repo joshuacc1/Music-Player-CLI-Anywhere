@@ -82,6 +82,9 @@ class MusicEventHandler:
 
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
+        if not any([x in ['filename', 'controls'] for x in event.keys()]):
+            return None
+
         songfile = event['filename']
         event_type = event['controls']
         if isdir(self.dir + songfile):
