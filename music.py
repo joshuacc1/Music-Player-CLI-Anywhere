@@ -79,9 +79,6 @@ class MusicEventHandler:
         self.progress = 0
         self.event_publishers = []
 
-    def get_dir(self, file):
-        return os.path.isdir(os.path.join(self.dir, '/'+file))
-
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
         if not any([x in ['filename', 'controls'] for x in event.keys()]):
@@ -89,29 +86,27 @@ class MusicEventHandler:
 
         songfile = event['filename']
         event_type = event['controls']
-        try:
-            if event_type == "play" and not self.get_dir(songfile):
-                self.queue = FileHandler(self.dir).files
-                if not songfile == self.currentsong:  # If a song hasn't been selected already
-                    self.currentsong = songfile
-                    self.musicplayer.load_file(self.dir + os.path.sep + songfile)
-                else:
-                    self.musicplayer.unpause()
 
-            elif event_type == "pause":
-                self.musicplayer.pause()
+        if event_type == "play":
+            self.queue = FileHandler(self.dir).files
+            if not songfile == self.currentsong:  # If a song hasn't been selected already
+                self.currentsong = songfile
+                self.musicplayer.load_file(self.dir + os.path.sep + songfile)
+            else:
+                self.musicplayer.unpause()
 
-            elif event_type == "next" and len(self.queue) != 0:
-                self.queue_pointer += (self.queue.index(songfile) + 1)
-                self.queue_pointer = self.queue_pointer % len(self.queue)
-                self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+        elif event_type == "pause":
+            self.musicplayer.pause()
 
-            elif event_type == "previous" and len(self.queue) != 0:
-                self.queue_pointer += self.queue.index(songfile) - 1
-                self.queue_pointer = self.queue_pointer % len(self.queue)
-                self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
-        except pygame.error:
-            pass  # The intention is to change enter the folder here
+        elif event_type == "next" and len(self.queue) != 0:
+            self.queue_pointer += (self.queue.index(songfile) + 1)
+            self.queue_pointer = self.queue_pointer % len(self.queue)
+            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+
+        elif event_type == "previous" and len(self.queue) != 0:
+            self.queue_pointer += self.queue.index(songfile) - 1
+            self.queue_pointer = self.queue_pointer % len(self.queue)
+            self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
 
     def run(self) -> bool:
         """Updates progress bar"""

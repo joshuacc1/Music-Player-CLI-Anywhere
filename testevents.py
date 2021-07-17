@@ -8,6 +8,7 @@ from music import MusicEventHandler
 from MusicTerminal import MusicTerminal
 from Widgets import Option, ProgressBarWidget, SelectWidget
 
+
 def main():
     term = Terminal()
     m = MusicTerminal(term)
@@ -22,10 +23,9 @@ def main():
     files = fh.files
     filenames = []
 
-    for folder in fh.folders:
-        filenames.append(Option([term.blue(folder)], folder))
     for file in files:
         filenames.append(Option([file], file))
+
     music_menu = SelectWidget(filenames, terminal=term)
     music_menu.name = 'filename'
 
