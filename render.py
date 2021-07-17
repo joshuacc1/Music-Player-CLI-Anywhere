@@ -84,7 +84,7 @@ class Render:
         self.screen[-3] = t + " " * (self.width - 18 - n) + self.skins[self.skin]["info"] + "volume: " + volume
         self.screen[-3] += self.skins[self.skin]["bar"] + "    "
 
-    def gen_art_dim(self) -> (int, int):
+    def gen_art_dim(self) -> tuple[int, int]:
         """Generates the dimentions for the album art in the form (height, width)"""
         if (self.width - 2) / 2 >= self.height - 11:
             return self.height - 11, (self.height - 11) * 2
