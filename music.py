@@ -1,7 +1,6 @@
 import os
 
 import pygame
-from genericpath import isdir
 
 from FileHandling import FileHandler
 from Widgets import Widget
@@ -80,6 +79,9 @@ class MusicEventHandler:
         self.progress = 0
         self.event_publishers = []
 
+    def get_dir(self, file):
+        return os.path.isdir(os.path.join(self.dir, '/'+file))
+
     def update(self, event: dict) -> None:
         """Called when app subscribed to has an event"""
         if not any([x in ['filename', 'controls'] for x in event.keys()]):
@@ -87,10 +89,8 @@ class MusicEventHandler:
 
         songfile = event['filename']
         event_type = event['controls']
-        if isdir(self.dir + songfile):
-            os.chdir(self.dir+songfile)
-        else:
-            if event_type == "play":
+        try:
+            if event_type == "play" and not self.get_dir(songfile):
                 self.queue = FileHandler(self.dir).files
                 if not songfile == self.currentsong:  # If a song hasn't been selected already
                     self.currentsong = songfile
@@ -110,6 +110,8 @@ class MusicEventHandler:
                 self.queue_pointer += self.queue.index(songfile) - 1
                 self.queue_pointer = self.queue_pointer % len(self.queue)
                 self.musicplayer.load_file(self.dir + os.path.sep + self.queue[self.queue_pointer])
+        except pygame.error:
+            pass  # The intention is to change enter the folder here
 
     def run(self) -> bool:
         """Updates progress bar"""

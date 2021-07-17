@@ -154,7 +154,7 @@ class SelectWidget(Widget):
                     phrase.append(f"{self.options[i].line(row)}")
         return phrase
 
-    def get_dimensions(self) -> (int, int):
+    def get_dimensions(self) -> tuple[int, int]:
         """Gets the dimensions of the widget"""
         lines = self.render_lines()
         if self.layout == 'Horizontal':
