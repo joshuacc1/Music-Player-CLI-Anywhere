@@ -1,0 +1,3 @@
+[console_scripts]
+casp = casp.main:run
+

@@ -2,8 +2,8 @@ import os
 
 import pygame
 
-from FileHandling import FileHandler
-from Widgets import Widget
+from casp.FileHandling import FileHandler
+from casp.Widgets import Widget
 
 pygame.init()
 pygame.mixer.init()
